@@ -82,7 +82,7 @@ We use two internal filetypes for data at rest:
 the following core technologies and specifications:
 
   1. xarray
-  2. [xdggs Repository](https://github.com/xarray-contrib/xdggs)
+  2. [xdggs](https://github.com/xarray-contrib/xdggs)
   3. healpix
   4. Apache Hive
   5. Climate and Forecast metadata convention (cf-xarray or similar)
@@ -233,7 +233,11 @@ with options to change the data resolution once the store is loaded. e.g.,
    dt = open_datatree('moc_pyramid.zarr)
 ```
 
-...or equivlent to open a zarr DataSet / DataArray
+...or equivalent to open a zarr DataSet / DataArray
+
+This is different than the NERSC remapping Healpix pipeline, in that we're
+trying to get some of this functionality directly into xarray and zarr at
+a deeper and more general level.
 
 ## Open Technical Questions
 
