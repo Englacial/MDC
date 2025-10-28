@@ -34,7 +34,8 @@ how our MDC does when comparing against the native resolution; i.e.:
     (ISSM @ 8 km, ice surface) - (PISM @ 8 km, ice surface)
 ```
 
-                             versus
+...versus:
+
 
 ```
    (ISSM @ 13.5 km, ice surface) - (PISM @ 8 km, ice surface)
@@ -59,21 +60,29 @@ assimilation for simple comparisons.
 
 Our tool does the following:
 
-  Input(any data resolution / projection / filetype / etc) --> Common DGGS (in
-  cloud) 
-  
-  Output(Common DGGS) --> (any data resolution / projection / filetype /
-  etc) (with aggregation, stats, viz)
+```
+Input(any data resolution / projection / filetype / etc) --> Common DGGS (in cloud) 
+```
+
+```
+Output(Common DGGS) --> (any data resolution / projection / filetype / etc) (with aggregation, stats, viz)
+```
 
 In other words, we are agnostic as to data inputs or outputs, but highly
 opinionated about how we assimilate within our internal data layout model.
 
-We use two internal filetypes for data at rest: zarr v3(for gridded data) or
-parquet (for non-gridded data), and build on and use the following core
-technologies and specifications:
+Note that there's already a bit of prior art here that's worth looking into:
+
+- [Remapping HEALPix Pipeline](https://github.com/WACCEM/healpix-remapping) - High-performance remapping at NERSC (for input side)
+- [xESMF](https://xesmf.readthedocs.io/) - Regridding for Earth System Models (for output side)
+
+We use two internal filetypes for data at rest: 
+[zarr v3](https://zarr-specs.readthedocs.io/en/latest/v3/core/v3.0.html)
+(for gridded data) or parquet (for non-gridded data), and build on and use
+the following core technologies and specifications:
 
   1. xarray
-  2. xdggs
+  2. [xdggs Repository](https://github.com/xarray-contrib/xdggs)
   3. healpix
   4. Apache Hive
   5. Climate and Forecast metadata convention (cf-xarray or similar)
@@ -84,23 +93,34 @@ For visualization, we assume some combination of three paths forward:
      the xarray object (with possible regridding as needed)
   2. Rust / web assembly to read and interpret the zarr and qeoparquet files
      directly from S3 into a web browser (with level of detail zoom and pre-
-     built data pyramids)
-  3. Longboard integration for GPU rendering (since it already has support
-     for some of this)
+     built data pyramids). [cdshealpix](https://github.com/cds-astro/cds-healpix-rust) 
+     is an example here, but there are several in this space.
+  3. [lonboard](https://github.com/developmentseed/lonboard) integration for
+     GPU rendering (since it already has support for some of this). Another 
+     option in this space is [gridlook](https://github.com/d70-t/gridlook),
+     which has a [zarr-based healpix webmap here](https://gridlook.pages.dev/#https://swift.dkrz.de/v1/dkrz_41caca03ec414c2f95f52b23b775134f/reanalysis/v1/ERA5_P1M_7.zarr::varname=100u::camerastate=eyJwb3NpdGlvbiI6WzAuMDAwMDAyNjA0OTA1MTc4NTY3OTgyNCw3LjgzNjUwODY0NjQ0MTU4N2UtNywyLjcyMDEwNjk2MzQyNzU5MTRdLCJxdWF0ZXJuaW9uIjpbMi45ODMyNDU5MDE2NjA5MjRlLTcsNC4wMTI3ODc4NTk3MjIxNjhlLTcsMC44MDI1MjE5MDAzNjcyMzMxLDAuNTk2NjIyNjYwODQyNDQxMl0sImZvdiI6Ny41LCJhc3BlY3QiOjIuMDQwNDY4NTgzNTk5NTc0LCJuZWFyIjowLjEsImZhciI6MTAwMH0).
 
 Statistical operations fall into three categories:
 
   1. Simple. These are things like nearest / approximate neighbor, mean or std
      per cell, counts, and simple regridding; i.e., things that are natively
      supported by xarray or xdggs.
-  2. Domain. External libraries like GStatSim for geostatistical interpolation,
-     or GDAL for more complex (but still standard) types of resampling and
-     aggregation.
+  2. Domain. External libraries like [GStatSim](https://github.com/GatorGlaciology/GStatSim)
+     for geostatistical interpolation, or GDAL for more complex (but still
+     standard) types of resampling and aggregation.
   3. Custom. User defined, or specialized metrics that we may define for
      climate model or observational data specifically.
 
 We don't expect a robust custom statistical package for our MVP, but want to
 be aware that the design should facilitate having support for one down the line.
+
+**Other References:**
+- [xdggs MOC Index PR #151](https://github.com/xarray-contrib/xdggs/pull/151) - Memory-efficient indexing for billion-cell HEALPix datasets
+- [ndpyramid](https://github.com/carbonplan/ndpyramid) - Multi-resolution pyramid generation for xarray from carbon plan (pyramids for zarr data not on healpix)
+- [nextgems](https://nextgems-h2020.eu) - European 'digital twin' project for climate that uses Healpix
+- [nextGEMS HEALPix Implementation](https://nextgems-h2020.eu/catalog.yaml) - Catalog from above effort for production km-scale climate simulations on HEALPix grids
+- [mhealpy Documentation](https://mhealpy.readthedocs.io/) - Multi-resolution HEALPix maps with MOC support
+- [MOC v2.0 Standard](https://ivoa.net/documents/MOC/) - IVOA Multi-Order Coverage map specification
 
 ## Data Model and Philosophy
 
@@ -145,6 +165,9 @@ structure.  Aggregated cells should have at a minimum a 'count' value that
 describes how many observations contribute to that cell; ideally, there also
 would be std stored as well-- although this could be also potentially be
 calculated client side.
+
+**References:**
+- [mortie PyPI Package](https://pypi.org/project/mortie/) - Morton indexing functions using HEALPix
 
 ## Development Goals
 
@@ -234,6 +257,12 @@ different resolutions. In other words, what do DataTrees give us, and what are
 the cost for implementing them-- and more specifically, what is the marginal
 cost and benefit to this design choice compared to avoiding them?
 
+**References:**
+- [xarray DataTree Performance Issue #9455](https://github.com/pydata/xarray/issues/9455) - Cloud storage write performance challenges
+- [xarray DataTree Deep Tree Performance #9511](https://github.com/pydata/xarray/issues/9511) - Performance with deep hierarchical structures
+- [xdggs DataTree Support Request #171](https://github.com/xarray-contrib/xdggs/issues/171) - Integration request for DataTree in xdggs
+- [DataTree Documentation](https://docs.xarray.dev/en/latest/user-guide/hierarchical-data.html) - Official xarray hierarchical data guide
+
 ### What is our optimal chunking and sharding strategy?
 
 We've adopted a hierarchical spatial partition schema (see morton.md for more
@@ -249,7 +278,12 @@ details), but there remains some questions:
      have a run of spatial index labels, but still need to encode time. Is time
      at the base-- S3://bucket/prefix/2022/{region}/{chunk}/{shard}/file.zarr ,
      or the tail-- S3://bucket/prefix/{region}/{chunk}/{shard}/2022/file.zarr?
-  4. Do we need to modify the zarr schema at all to do this? 
+  4. Do we need to modify the zarr schema at all to do this?
+
+**References:**
+- [Zarr v3 Sharding Specification](https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/) - Hierarchical chunking for reduced file count
+- [Zarr Sharding Issue #2346](https://github.com/zarr-developers/zarr-python/issues/2346) - Sharding implementation in zarr v2/v3
+- [Pangeo Cloud Data Guide](https://pangeo-data.github.io/pangeo-cmip6-cloud/) - Best practices for chunking climate data 
 
 ### Do we store Morton or Nested?
 
@@ -273,7 +307,8 @@ Downside 2 can be addressed by either adding support, or by simply wrapping
 the coordinate transform from Nested to Morton. Downside 1 can be addressed by
 either using morton indices relative to the region / chunk path, or by only
 using them to label files in combination with encoding Nested indices and
-casting from them as needed. 
+casting from them as needed.
+
 
 ### How hard do we need to think about global coverage?
 
@@ -292,6 +327,10 @@ won't encounter this for our science domain? Realistically, the answer is
 have for our MVP, but we also should try to avoid decisions that will cause
 other communities pain when they try to solve them later!
 
+**References:**
+- [HEALPix Geometric Properties](https://healpix.sourceforge.io/html/intro.htm) - Discussion of vertex valence irregularities
+- [CF Conventions HEALPix Discussion #433](https://github.com/cf-convention/cf-conventions/issues/433) - Standardization efforts for HEALPix in CF
+
 ### Should we consider Uxarray?
 
 My impression is not. Uxarray seems to add complexity, and our grids all have
@@ -300,3 +339,18 @@ assimilation grid. For unstructured data, parquet with appropriate tiling
 seems to already suffice. That said, I have little experience with Uxarray
 and would be open to hearing a compelling reason why it applies as a candidate
 for our tech stack.
+
+**References:**
+- [UXarray HEALPix Support](https://uxarray.readthedocs.io/en/latest/user-guide/healpix.html) - Converting HEALPix to UGRID conventions
+- [Project Pythia HEALPix Cookbook](https://projectpythia.org/healpix-cookbook) - Tutorials for HEALPix with uxarray
+
+## Additional Resources
+
+### Community Resources
+- [awesome-HEALPix](https://github.com/pangeo-data/awesome-HEALPix) - Curated list of HEALPix resources
+- [awesome-discrete-global-grid-systems](https://github.com/LandscapeGeoinformatics/awesome-discrete-global-grid-systems) - Broader DGGS resource list
+
+### Key Papers
+- Górski et al. (2005) ["HEALPix: A Framework for High-Resolution Discretization"](https://iopscience.iop.org/article/10.1086/427976) - Foundational HEALPix paper
+- Singer et al. (2022) ["HEALPix Alchemy"](https://iopscience.iop.org/article/10.3847/1538-3881/ac5ab8) - Database spatial indexing
+- ["XDGGS: Xarray DGGS Support"](https://isprs-archives.copernicus.org/articles/XLVIII-4-W12-2024/75/2024/) - ISPRS paper on xdggs framework
