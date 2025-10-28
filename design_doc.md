@@ -119,8 +119,6 @@ be aware that the design should facilitate having support for one down the line.
 - [ndpyramid](https://github.com/carbonplan/ndpyramid) - Multi-resolution pyramid generation for xarray from carbon plan (pyramids for zarr data not on healpix)
 - [nextgems](https://nextgems-h2020.eu) - European 'digital twin' project for climate that uses Healpix
 - [nextGEMS HEALPix Implementation](https://nextgems-h2020.eu/catalog.yaml) - Catalog from above effort for production km-scale climate simulations on HEALPix grids
-- [mhealpy Documentation](https://mhealpy.readthedocs.io/) - Multi-resolution HEALPix maps with MOC support
-- [MOC v2.0 Standard](https://ivoa.net/documents/MOC/) - IVOA Multi-Order Coverage map specification
 
 ## Data Model and Philosophy
 
@@ -167,7 +165,10 @@ would be std stored as well-- although this could be also potentially be
 calculated client side.
 
 **References:**
+- [canonical paper](https://www.sciencedirect.com/science/article/pii/S2405844017304966) - Morton indexing for healpix paper
 - [mortie PyPI Package](https://pypi.org/project/mortie/) - Morton indexing functions using HEALPix
+- [mhealpy Documentation](https://mhealpy.readthedocs.io/) - Multi-resolution HEALPix maps with MOC support
+- [MOC v2.0 Standard](https://ivoa.net/documents/MOC/) - IVOA Multi-Order Coverage map specification
 
 ## Development Goals
 
