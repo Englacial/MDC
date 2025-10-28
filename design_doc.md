@@ -281,13 +281,12 @@ details), but there remains some questions:
      ingest?
   3. Do we adopt a time dominate partition strategy? Within the hierarchy, we
      have a run of spatial index labels, but still need to encode time. Is time
-     at the base-- S3://bucket/prefix/2022/{region}/{chunk}/{shard}/file.zarr ,
-     or the tail-- S3://bucket/prefix/{region}/{chunk}/{shard}/2022/file.zarr?
+     at the base-- `S3://bucket/prefix/2022/{region}/{chunk}/{shard}/file.zarr` ,
+     or the tail-- `S3://bucket/prefix/{region}/{chunk}/{shard}/2022/file.zarr`?
   4. Do we need to modify the zarr schema at all to do this?
 
 **References:**
 - [Zarr v3 Sharding Specification](https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/) - Hierarchical chunking for reduced file count
-- [Zarr Sharding Issue #2346](https://github.com/zarr-developers/zarr-python/issues/2346) - Sharding implementation in zarr v2/v3
 - [Pangeo Cloud Data Guide](https://pangeo-data.github.io/pangeo-cmip6-cloud/) - Best practices for chunking climate data 
 
 ### Do we store Morton or Nested?
