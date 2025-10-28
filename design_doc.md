@@ -16,7 +16,10 @@ The full output for Antarctica is ~1.2 terabytes, although adding in forcing
 and auxiliary datasets moves the total closer to 2TB. This data is an awkward
 amount to work with - individual model runs can easily fit into memory, but
 comparing across them is cumbersome, especially within a compute or bandwidth
-limited setting (i.e., a browser).
+limited setting (i.e., a browser). Below is a figure showing the distribution
+of file sizes and numbers for the full Antarctica inter comparison:
+
+![File Size Distribution](ismip6_file_sizes.png)
 
 Part of the reason for ISMIP6 is to make comparisons easier between the output
 datasets; participants agreed to conform to a common set of grids (which nest),
