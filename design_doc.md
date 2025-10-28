@@ -30,11 +30,15 @@ We'd like to take advantage of this setup to test and develop our MDC tool.
 We'll compare some of the models that are in the common grid, and then compare
 how our MDC does when comparing against the native resolution; i.e.:
 
+```
     (ISSM @ 8 km, ice surface) - (PISM @ 8 km, ice surface)
+```
 
                              versus
 
+```
    (ISSM @ 13.5 km, ice surface) - (PISM @ 8 km, ice surface)
+```
 
 The first comparison is a simple difference (i.e., subtraction) in xarray,
 which works because the grids are aligned. The second case should give similar
@@ -190,17 +194,21 @@ extent observation tiles, rather than unified large continuous rasters).
 
 Ideally, we're looking for a fairly simple API that looks something like:
 
+```python
     ds = xr.open_dataset("data.nc")
     moc = xdggs.healpix(ds, resolution=11, indexing_scheme="morton")
     # resolution for terminal leaf node of MOC tree
     moc.to_zarr(...)
     # spatial chunking / sharding by either implicit inspection
     # or by explicit parameter setting
+```
 
 Opening the dataset would either be same as a standard xarray zarr store,
 with options to change the data resolution once the store is loaded. e.g.,
 
+```python
    dt = open_datatree('moc_pyramid.zarr)
+```
 
 ...or equivlent to open a zarr DataSet / DataArray
 
