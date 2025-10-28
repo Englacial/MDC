@@ -285,10 +285,6 @@ details), but there remains some questions:
      or the tail-- `S3://bucket/prefix/{region}/{chunk}/{shard}/2022/file.zarr`?
   4. Do we need to modify the zarr schema at all to do this?
 
-**References:**
-- [Zarr v3 Sharding Specification](https://zarr-specs.readthedocs.io/en/latest/v3/codecs/sharding-indexed/) - Hierarchical chunking for reduced file count
-- [Pangeo Cloud Data Guide](https://pangeo-data.github.io/pangeo-cmip6-cloud/) - Best practices for chunking climate data 
-
 ### Do we store Morton or Nested?
 
 There's already support for Nested MOC across the ecosystem, but Morton
@@ -313,7 +309,6 @@ either using morton indices relative to the region / chunk path, or by only
 using them to label files in combination with encoding Nested indices and
 casting from them as needed.
 
-
 ### How hard do we need to think about global coverage?
 
 We are fortunate in that our data is almost always polar-- we look primarily
@@ -332,7 +327,6 @@ have for our MVP, but we also should try to avoid decisions that will cause
 other communities pain when they try to solve them later!
 
 **References:**
-- [HEALPix Geometric Properties](https://healpix.sourceforge.io/html/intro.htm) - Discussion of vertex valence irregularities
 - [CF Conventions HEALPix Discussion #433](https://github.com/cf-convention/cf-conventions/issues/433) - Standardization efforts for HEALPix in CF
 
 ### Should we consider Uxarray?
@@ -356,5 +350,4 @@ for our tech stack.
 
 ### Key Papers
 - Górski et al. (2005) ["HEALPix: A Framework for High-Resolution Discretization"](https://iopscience.iop.org/article/10.1086/427976) - Foundational HEALPix paper
-- Singer et al. (2022) ["HEALPix Alchemy"](https://iopscience.iop.org/article/10.3847/1538-3881/ac5ab8) - Database spatial indexing
 - ["XDGGS: Xarray DGGS Support"](https://isprs-archives.copernicus.org/articles/XLVIII-4-W12-2024/75/2024/) - ISPRS paper on xdggs framework
