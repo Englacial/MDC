@@ -248,3 +248,9 @@ evidence_for_model = PDM(data, model, subset, kwargs=...)
 
 And then either use the encoded uncertainty from both data and model to assess
 the evidence for the model, or, provide a likelihood function to do so.
+
+
+Defining the imaginary bayes library and function are likely out of scope for
+our inital sprints-- but we should have them in mind as we define
+infrastructure that will need to be compatible and faciliate that work in the
+future.
