@@ -12,7 +12,7 @@ This document contains some guiding use cases of the types of data-model compari
 
 **Processing needed:**
 * Conversion from absolute temperature to temperature relative to pressure melting point
-* [Aggregation](aggregation.md) of data and model inputs to the same mesh
+* [Aggregation](regridder/data_aggregation.md) of data and model inputs to the same mesh
 * Calculation of a probability from an observed point and the parameters of a statistical distribution
 
 **Statistical comparison:** Map of pointwise likelihood of the model’s predicted bed temperature given data
@@ -28,7 +28,7 @@ This document contains some guiding use cases of the types of data-model compari
 **Model inputs:** Percentage of floating ice in the grid cell (ISMIP variable: `sftflf`)
 
 **Processing needed:**
-* [Aggregation](aggregation.md) of data and model inputs to the same mesh (in this case, likely to the model's native mesh because re-gridding of any sort will lose too much information)
+* [Aggregation](regridder/data_aggregation.md) of data and model inputs to the same mesh (in this case, likely to the model's native mesh because re-gridding of any sort will lose too much information)
 * Calculation of a probability from an observed point and the parameters of a statistical distribution
 
 **Statistical comparison:** Pointwise probability of the percentage floating measurement (relative to the grid it refers to) given the radar-derived mask of seawater probability.
@@ -45,7 +45,7 @@ This document contains some guiding use cases of the types of data-model compari
 
 **Processing needed:**
 * Masking of ATL06 data product to select only over the relevant ice sheet
-* [Aggregation](aggregation.md) of data and model inputs to the same mesh
+* [Aggregation](regridder/data_aggregation.md) of data and model inputs to the same mesh
 
 **Statistical comparison:** Probability of the resolved surface elevation given the uncertainty estimate from the ATL06 data product.
 
