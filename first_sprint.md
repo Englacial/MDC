@@ -71,11 +71,75 @@ lithk_var = xr.concat(
 
 ## Dataset example: IceSAT-2 ATL06 (TODO: Shane)
 
-### Load the data with uncertainty encoded
+Observational data is typically larger, and less well behaved then model data;
+for instance, we have to deal with orbital path convergence at the poles, and
+variable spacing. This issue is especially pronounced at the poles (where we do
+most of work), since NASA encodes data in time-dominate orbital segments, but
+our unit of analysis is typically a contiguous spatial patch like a sub-basin or
+model grid cell.
 
-### Aggregate to a grid with uncertainty propagated
+To get an idea of what this data view looks like, here's a single orbital cycle
+of ICESat-2 data over Antarctica:
 
-### Probabalistic comparison to one ISMIP6 output
+![atl06 tracks](./atl06.png)
+
+There's over 1,300 files, and the geometry is such that even a small sub-basin
+will typically overlap 10-20% of those files.
+
+### How we load the data now
+
+Since we generally can't open hundreds of files in a convenient way, we
+generally start with a data transform before we do anything. There's two options
+for this:
+
+  1. Use NASA infrastructure to query and repack a custom region of interest
+  2. Download and restructure the data ourselves in a way that's spatially tiled
+
+Option 1 is typically a manual process which isn't very reproducible or
+script-able, so we typically choose option 2 and preprocess to a new format.
+To do this, we'd go from the native h5 files to arrow-- see [this
+example](https://github.com/espg/iceDivides/blob/main/IngestATL03_cycle02.ipynb)
+which defines the schema for the data to extract, and then concatenates the
+orbital segments into a single tabular column. In practice, we'd typically use
+dask to run downloads in parallel. As with the ISMIP6 models, this first step is
+several hundred lines of code.
+
+This also requires using a machine large enough to fit everything in memory-- in
+practice we'll do this once and define a spatial partition to write out the
+dataset in more convenient form for further analysis using smaller machines
+(either in isolation, or as a group of workers). To make this step more
+computationally palatable, we can do a temporal partition prior to the spatial
+partition (e.g., monthly or even daily splits), since those splits can be
+defined without reading all the data into memory.
+
+### Aggregate to a grid
+
+Writing out data to spatial partitions is fairly simple-- we execute a
+coordinate transform to digital global grid system, and then assign a new column
+to our arrow arrays:
+
+```python
+morton_idx = morton(atl06_df.lat.values, atl06_df.lon.values)
+
+atl06_df['region'] = morton_idx // 10**5    # or other resolution
+atl06_df['chunk'] = morton_idx // 10**10    # or other resolution
+atl06_df['shard'] = morton_idx // 10**15    # or other resolution
+
+atl06_df.to_parquet('s3://mybucket/atl06',
+                    partition_cols=['region', 'chunk','shard')
+```
+
+The only thing we need decide is what digital global grid system to use (morton
+or other healpix variant, S2, H3, etc), how many levels to partition at what
+resolutions, and where to put the output (i.e., local or cloud).
+
+Above we use parquet since it lets us defined a nested hierarchy using HIVE,
+but this would be great to do in datatree if there was similar support for
+nested spatial partitions!
+
+### Probabilistic comparison to one ISMIP6 output
+
+
 
 # Part 2: Related issues/improvements in open source tools
 
@@ -166,7 +230,7 @@ surely impacts both structures.
 
 This is also likely related to [xdggs #155](https://github.com/xarray-contrib/xdggs/issues/155).
 
-### Spatial Partioning in Zarr / geopandas / xarray
+### Spatial Partitioning in Zarr / geopandas / xarray
 
 We're unsure of the best way to open large amounts of observational data in
 datatrees. As mentioned above, we want to be able to do lazy loading, and open a
