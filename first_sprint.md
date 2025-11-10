@@ -21,8 +21,9 @@ have already spent.
 
 ### Support DataTree in apply_ufunc ([xarray #9789](https://github.com/pydata/xarray/issues/9789))
 
-This is a sub-issue of [#9106](https://github.com/pydata/xarray/issues/9106), and is probably the highest impact of the items
-described within that issue-- and it would honestly be great to fully close
+This is a sub-issue of [#9106](https://github.com/pydata/xarray/issues/9106),
+and is probably the highest impact of the items described within that issue--
+and it would honestly be great to fully close
 [#9106](https://github.com/pydata/xarray/issues/9106) if possible. 
 
 There's a lot that we'd like to do across datasets and datatree subtrees /
@@ -31,11 +32,11 @@ those other tasks easier, by providing a cleaner API.
 
 ### Parallelize map_over_subtree ([xarray #9502](https://github.com/pydata/xarray/issues/9502))
 
-Much of the later work we envision will involve significant horizontal
-scaling. My assumption is that [#9789](https://github.com/pydata/xarray/issues/9789) will help to enable much of that, but
-this item is related as well. The hope is that for grantees that are looking
-for support with scaling their work, we can leverage datatree to execute those
-workflows over collections of datasets.
+Much of the later work we envision will involve significant horizontal scaling.
+My assumption is that [#9789](https://github.com/pydata/xarray/issues/9789)
+will help to enable much of that, but this item is related as well. The hope is
+that for grantees that are looking for support with scaling their work, we can
+leverage datatree to execute those workflows over collections of datasets.
 
 ### DataTree: missing methods ([xarray #10015](https://github.com/pydata/xarray/issues/10015))
 
@@ -54,10 +55,11 @@ DataTree interface to be generally usable, and backed be an architecture that
 can scale appropriately. There's a number of smaller issues that might need to
 be addressed:
 
-  1. Performance of deep DataTrees ([xarray #9511](https://github.com/pydata/xarray/issues/9511)). We're looking to open dozens
-     of models, and hundreds of model / experiment pairs, and it would be nice
-     to do this in a way that doesn't hang. The situation for pulling in
-     observational data into datatrees could result in thousands of files.
+  1. Performance of deep DataTrees ([xarray #9511](https://github.com/pydata/xarray/issues/9511)).
+     We're looking to open dozens of models, and hundreds of model / experiment
+     pairs, and it would be nice to do this in a way that doesn't hang. The
+     situation for pulling in observational data into datatrees could result in
+     thousands of files.
   2. DataTree.to_zarr() is very slow writing to high latency store ([xarray
      #9455](https://github.com/pydata/xarray/issues/9455)). Similar to above on the cloud data access back end.
   3. Implement async support for open_datatree ([xarray #10742](https://github.com/pydata/xarray/issues/10742)). Related,
@@ -83,10 +85,11 @@ here:
 
 https://github.com/pydata/xarray/blob/main/design_notes/flexible_indexes_notes.md
 
-That work has been occurring in blocks, first with [xarray PR #5692](https://github.com/pydata/xarray/pull/5692), and then
-continuing with open [xarray issue #6293](https://github.com/pydata/xarray/issues/6293). We don't expect that we'll need to do
-all of this, but some of what we'd like to do likely requires addressing some of
-these open issues.
+That work has been occurring in blocks, first with [xarray PR
+#5692](https://github.com/pydata/xarray/pull/5692), and then continuing with
+open [xarray issue #6293](https://github.com/pydata/xarray/issues/6293). We
+don't expect that we'll need to do all of this, but some of what we'd like to
+do likely requires addressing some of these open issues.
 
 ### Design/Datamodel Decision: Very large datasets ([xdggs #143](https://github.com/xarray-contrib/xdggs/issues/143))
 
