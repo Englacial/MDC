@@ -68,12 +68,14 @@ be addressed:
 ## Regridder work via xdggs and xarray
 
 Regridding and interpolation remain stubborn problems in our community-- and
-problems that three of our five grantees will be either addressing directly
-through there projects, or requesting help with. We have some thoughts on
-how to approach this by using some the astronomic communities healpix
-framework, which has been successful in using that technology for data
-assimilation and integration. Below are few specific issues that we see related
-to this in both the xarray and xdggs libraries.
+problems that **three of our five** grantees will be either addressing directly
+through there projects, or requesting help with. Two of grantees are working on
+interpolation and ***still*** want help with regridding as a preprocessing step
+to their interpolation methods! We have some thoughts on how to approach this
+by using some the astronomic communities healpix framework, which has been
+successful in using that technology for data assimilation and integration.
+Below are few specific issues that we see related to this in both the xarray
+and xdggs libraries.
 
 ### Explicit indexers: next steps ([xarray #6293](https://github.com/pydata/xarray/issues/6293))
 
