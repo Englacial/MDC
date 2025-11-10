@@ -120,32 +120,61 @@ production using some of the advances above.
 
 ## Dataset example: Loading ISMIP6 model outputs (TODO: Thomas)
 
-What we want to be able to do:
+How this is done now:
 
 ```python
-ismip6_outputs = open_datatree('gs://ismip6/')
-my_variable = ismip6_outputs[{'model': 'UCIJPL/ISSM', 'experiment': 'exp05', 'variable': 'lithk'}]
-```
-
-* ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
-* Every variable is a separate NetCDF file, which are vaguely CF-compliant but with lots of errors
-* All of them are aligned regular grids, but there are multiple resolutions
-* This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
-* Key point: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
-
-```python
-ismip6_df = ismip6_index.get_file_index() # This is 200 lines of code
+ismip6_df = ismip6_index.get_file_index() # This is 200 lines of code - https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py
 path = ismip6_df[{'model': 'UCIJPL/ISSM', 'experiment': 'exp05', 'variable': 'lithk'}]['path']
 my_variable = xr.open_dataset(path)
 ```
 
+What we want to be able to do:
+
+```python
+ismip6_dt = open_datatree('gs://ismip6/ismip6-virtual.zarr')
+my_variable = ismip6_dt['UCIJPL/ISSM']['exp05']['lithk']
+```
+
+* ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
+* Every variable is a separate NetCDF file, which are nominally CF-compliant but with a scattering of errors
+* All of them are aligned regular grids in EPSG:3031, but there are multiple resolutions
+* This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
+* Key issue: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
+
 ### Variance of some subset of models
 
-* Comparison here is assuming some ability to regrid
+```python
+# Assuming we have an ismip6_outputs datatree from the last example
+model_outputs = ismip6_dt.match("*/exp05")
+
+comparison_grid = xr.Dataset({
+    'x': (['x'], np.arange(-30400e3, 3040e3, 16e3)),
+    'y': (['y'], np.arange(-30400e3, 3040e3, 16e3)),
+})
+
+model_outputs = regrid(model_outputs, target=comparison_grid, func=np.mean)
+
+lithk_var = xr.concat(
+    [child['lithk'] for m in model_outputs.children.values()],
+    dim='m'
+).var(dim='m')
+```
+
+* We want a "batteries-included" way to regridding to a common grid
+* Regridding should be lazy
+* And (eventually) we need to support a pretty wide range of possible grids including rectilinear in lat/lon or projected coordiantes, healpix, and unstructued meshes
 
 
 ### Plots of some subset
 
+```python
+model_outputs = ismip6_dt.match("UCIJPL_ISSM/*")
+
+hv.Layout([
+    child['lithk'].hvplot(title=name, x='x', y='y', groupby='time')
+    for name, child in model_outputs.children.items()
+]).cols(3)
+```
 
 ## Dataset example: IceSAT-2 ATL06 (TODO: Shane)
 
