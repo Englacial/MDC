@@ -12,7 +12,7 @@ What follows is a list of explicit tasks to target as part of our first sprint,
 along with some brief description of why. We probably won't do them all-- but
 we'll almost certainly do some of them.
 
-## xarray DataTree Enhancements
+## General xarray DataTree Enhancements
 
 We start with a focus on DataTree. While we can and do describe general things
 we'd like to see in this ecosystem, it's almost certainly best to start with
@@ -63,7 +63,7 @@ be addressed:
   3. Implement async support for open_datatree (xarray #10742). Related,
      possibly a way forward for some of the above?
 
-## Regridder work via xddgs and xarray
+## Regridder work via xdggs and xarray
 
 Regridding and interpolation remain stubborn problems in our community-- and
 problems that three of our five grantees will be either addressing directly
@@ -71,14 +71,13 @@ through there projects, or requesting help with. We have some thoughts on
 how to approach this by using some the astronomic communities healpix
 framework, which has been successful in using that technology for data
 assimilation and integration. Below are few specific issues that we see related
-to this in both the xarray and xddgs libraries.
-
+to this in both the xarray and xdggs libraries.
 
 ### Explicit indexers: next steps (xarray #6293)
 
-We have some thoughts on how we could use xddgs to implement a regridder that
+We have some thoughts on how we could use xdggs to implement a regridder that
 functions across DataTree nodes. Some of that work is likely dependant on
-tighter / full integration with DataTree in xddgs, and much of that integration
+tighter / full integration with DataTree in xdggs, and much of that integration
 work is tied to the look running index refactoring-- design doc and details
 here:
 
@@ -89,6 +88,35 @@ continuing with open xarray issue #6293. We don't expect that we'll need to do
 all of this, but some of what we'd like to do likely requires addressing some of
 these open issues.
 
+### Design/Datamodel Decision: Very large datasets (xdggs #143)
+
+As mentioned above, we need to be able to open datatrees in a way that is
+usable. While the issue is presented for datasets rather than datatrees, it
+surely impacts both structures.
+
+This is also likely related to xdggs #155.
+
+### Spatial Partioning in Zarr / geopandas / xarray
+
+We're unsure of the best way to open large amounts of observational data in
+datatrees. As mentioned above, we want to be able to do lazy loading, and open a
+datatree without loading it. Given the data volumes and density of observational
+datasets, this likely means defining some spatial partition of the data.
+
+To actually do that, we likely have two (related) paths forward:
+
+  1. Figure out how to correctly represent spatial sharding in zarr
+  2. Use VirtualiZarr to map / save a prior constructed datatree
+
+Doing number 2 might require also doing number 1; xarray issue 9634 seems
+relevant here, although there are probably other issues and PRs across zarr,
+VirtualiZarr, xarray, etc.
+
+## Guiding use cases
+
+We have two prototypes of the type of functionallity we'd like to be able to do.
+These are written as proof of concept code-- ideally, we'll refactor them into
+production using some of the advances above.
 
 ## Dataset example: Loading ISMIP6 model outputs (TODO: Thomas)
 
