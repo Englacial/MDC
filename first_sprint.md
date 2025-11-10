@@ -1,23 +1,100 @@
 # Specific Tasks Proposed for Dev Seed Sprint 1
 
-There's a lot design, research, and visioning throughout this repository. The
-classic metaphor is "miss the forest for the trees", but, we also want to make
-sure that we avoid the opposite problem of "missing the trees for the forest".
+We want to start by laying some foundations for data-model comparisons. A lot of this
+is pulling lessons from the work that has been done for cloud-based data processing of
+the CMIP6 ensembles and bringing those tools to the cryosphere modelling and
+observational communities.
 
 Our general strategy is to prioritize high leverage open community problems,
 specifically choosing to focus on well defined harder tasks first-- i.e., the
 work that is hard, but also well scoped. That is, a few big trees to start on.
 
-What follows is a list of explicit tasks to target as part of our first sprint,
-along with some brief description of why. We probably won't do them all-- but
-we'll almost certainly do some of them.
+The first part of this document has two specific examples of functionality we want to
+make easy.
+
+*We're very happy to hear input on the targeted design patterns. Our goal is for these
+types of tasks to be simple and elegant for users -- not to follow the specified syntax
+exactly or rely on the specific packages mentioned here.*
+
+The second part of the document covers some specific gaps (linking GitHub issues where
+relevant) that we think connect to the functionality we're trying to build. These are
+not intended as a TODO list, but we'd be very happy to see some of these issues closed
+if it advances our goals described in the first part.
+
+# Part 1: Target use cases
+
+## Dataset example: Loading ISMIP6 model outputs (TODO: Thomas)
+
+How this is done now:
+
+```python
+ismip6_df = ismip6_index.get_file_index() # This is 200 lines of code - https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py
+path = ismip6_df[{'model': 'UCIJPL/ISSM', 'experiment': 'exp05', 'variable': 'lithk'}]['path']
+my_variable = xr.open_dataset(path)
+```
+
+What we want to be able to do:
+
+```python
+ismip6_dt = open_datatree('gs://ismip6/ismip6-virtual.zarr')
+my_variable = ismip6_dt['UCIJPL/ISSM']['exp05']['lithk']
+```
+
+* ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
+* Every variable is a separate NetCDF file, which are nominally CF-compliant but with a scattering of errors
+* All of them are aligned regular grids in EPSG:3031, but there are multiple resolutions
+* This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
+* Key issue: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
+
+### Variance of some subset of models
+
+```python
+# Assuming we have an ismip6_outputs datatree from the last example
+model_outputs = ismip6_dt.match("*/exp05")
+
+comparison_grid = xr.Dataset({
+    'x': (['x'], np.arange(-30400e3, 3040e3, 16e3)),
+    'y': (['y'], np.arange(-30400e3, 3040e3, 16e3)),
+})
+
+model_outputs = regrid(model_outputs, target=comparison_grid, func=np.mean)
+
+lithk_var = xr.concat(
+    [child['lithk'] for m in model_outputs.children.values()],
+    dim='m'
+).var(dim='m')
+```
+
+* We want a "batteries-included" way to regridding to a common grid
+* Regridding should be lazy
+* And (eventually) we need to support a pretty wide range of possible grids including rectilinear in lat/lon or projected coordiantes, healpix, and unstructued meshes
+
+
+### Plots of some subset
+
+```python
+model_outputs = ismip6_dt.match("UCIJPL_ISSM/*")
+
+hv.Layout([
+    child['lithk'].hvplot(title=name, x='x', y='y', groupby='time')
+    for name, child in model_outputs.children.items()
+]).cols(3)
+```
+
+## Dataset example: IceSAT-2 ATL06 (TODO: Shane)
+
+### Load the data with uncertainty encoded
+
+### Aggregate to a grid with uncertainty propagated
+
+### Probabalistic comparison to one ISMIP6 output
+
+# Part 2: Related issues/improvements in open source tools
 
 ## General xarray DataTree Enhancements
 
-We start with a focus on DataTree. While we can and do describe general things
-we'd like to see in this ecosystem, it's almost certainly best to start with
-existing open issues that leverage the cycles various members of the community
-have already spent.
+Xarray DataTree's could solve a lot of our issues, but they're currently missing some
+core functionality that would help a lot.
 
 ### Support DataTree in apply_ufunc ([xarray #9789](https://github.com/pydata/xarray/issues/9789))
 
@@ -117,74 +194,3 @@ Doing number 2 might require also doing number 1; [xarray issue #9634](https://g
 relevant here, although there are probably other issues and PRs across zarr,
 VirtualiZarr, xarray, etc.
 
-## Guiding use cases
-
-We have two prototypes of the type of functionallity we'd like to be able to do.
-These are written as proof of concept code-- ideally, we'll refactor them into
-production using some of the advances above.
-
-## Dataset example: Loading ISMIP6 model outputs (TODO: Thomas)
-
-How this is done now:
-
-```python
-ismip6_df = ismip6_index.get_file_index() # This is 200 lines of code - https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py
-path = ismip6_df[{'model': 'UCIJPL/ISSM', 'experiment': 'exp05', 'variable': 'lithk'}]['path']
-my_variable = xr.open_dataset(path)
-```
-
-What we want to be able to do:
-
-```python
-ismip6_dt = open_datatree('gs://ismip6/ismip6-virtual.zarr')
-my_variable = ismip6_dt['UCIJPL/ISSM']['exp05']['lithk']
-```
-
-* ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
-* Every variable is a separate NetCDF file, which are nominally CF-compliant but with a scattering of errors
-* All of them are aligned regular grids in EPSG:3031, but there are multiple resolutions
-* This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
-* Key issue: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
-
-### Variance of some subset of models
-
-```python
-# Assuming we have an ismip6_outputs datatree from the last example
-model_outputs = ismip6_dt.match("*/exp05")
-
-comparison_grid = xr.Dataset({
-    'x': (['x'], np.arange(-30400e3, 3040e3, 16e3)),
-    'y': (['y'], np.arange(-30400e3, 3040e3, 16e3)),
-})
-
-model_outputs = regrid(model_outputs, target=comparison_grid, func=np.mean)
-
-lithk_var = xr.concat(
-    [child['lithk'] for m in model_outputs.children.values()],
-    dim='m'
-).var(dim='m')
-```
-
-* We want a "batteries-included" way to regridding to a common grid
-* Regridding should be lazy
-* And (eventually) we need to support a pretty wide range of possible grids including rectilinear in lat/lon or projected coordiantes, healpix, and unstructued meshes
-
-
-### Plots of some subset
-
-```python
-model_outputs = ismip6_dt.match("UCIJPL_ISSM/*")
-
-hv.Layout([
-    child['lithk'].hvplot(title=name, x='x', y='y', groupby='time')
-    for name, child in model_outputs.children.items()
-]).cols(3)
-```
-
-## Dataset example: IceSAT-2 ATL06 (TODO: Shane)
-
-### Load the data with uncertainty encoded
-
-### Aggregate to a grid with uncertainty propagated
-
-### Probabalistic comparison to one ISMIP6 output
