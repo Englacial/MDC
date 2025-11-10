@@ -69,7 +69,7 @@ be addressed:
 
 Regridding and interpolation remain stubborn problems in our community-- and
 problems that **three of our five** grantees will be either addressing directly
-through there projects, or requesting help with. Two of grantees are working on
+through there projects, or requesting help with. Two of our grantees are working on
 interpolation and ***still*** want help with regridding as a preprocessing step
 to their interpolation methods! We have some thoughts on how to approach this
 by using some the astronomic communities healpix framework, which has been
