@@ -18,14 +18,15 @@ Other documents to explore on the following pages and directories:
  - [initial_use_cases](./initial_use_cases.md) describes example model-data
    comparisons we're trying to make easy
  - [vision](./vision.md) is another broad document that hints at the cleaner
-   API we're hoping to arrive at; we drafted it earlier in the design process
-   so it's a bit dated now, but it does show how we got to current design, and
-   some of the questions and alternatives we considered. 
+   API we're hoping to arrive at. 
 
 For our regridding module, check out the [regridder](./regridder) folder
 generally, and these docs in specific:
 
- - [design_doc](./regridder/design_doc.md) is our working draft design document
+ - [design_doc](./regridder/design_doc.md) is our working draft design
+   document; we drafted it earlier in the design process so it's a bit dated
+   now, but it does show how we got to our current design, and some of the
+   questions and alternatives we considered. 
  - [healpix.md](./regridder/healpix.md) is an overview of software maturity for
    supporing healpix meshes
 
