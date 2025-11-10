@@ -17,8 +17,10 @@ Other documents to explore on the following pages and directories:
 
  - [initial_use_cases](./initial_use_cases.md) describes example model-data
    comparisons we're trying to make easy
- - [vision](./vision.md) is another broad document that hints at the cleaner API
-   we're hoping to arrive at
+ - [vision](./vision.md) is another broad document that hints at the cleaner
+   API we're hoping to arrive at; we drafted it earlier in the design process
+   so it's a bit dated now, but it does show how we got to current design, and
+   some of the questions and alternatives we considered. 
 
 For our regridding module, check out the [regridder](./regridder) folder
 generally, and these docs in specific:
