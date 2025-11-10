@@ -31,11 +31,34 @@ and informative*.
 
 ## The technical problems with model-data comparisons
 
-| | Problem | Pitfalls | Our Approach |
-| --- | --- | --- | --- |
-| **INPUT** | <ul><li>Manual downloading of data is not scaleable or reproducible</li><li>Too many lines of code are spent loading and getting data in the right shape</li></ul> | <ul><li>Waiting on data providers to adopt new formats is too slow</li><li>Re-writing and storing data in large quantitites is [not](https://pangeo-forge.readthedocs.io/en/latest/) [sustainable](https://discourse.pangeo.io/t/us-central1-pangeo-hub-down/4591)</li></ul> | Lightweight, **zero-infrastructure catalogs** that reference data where it already lives using **CF conventions** for interoperability, such as [xOPR](https://github.com/englacial/xopr). <br /> Core technologies: [STAC](https://stacspec.org/en), [Intake](https://github.com/intake/intake), and [VirtualiZarr](https://github.com/zarr-developers/VirtualiZarr) |
-| **COMPARE** | Lack of sensible defaults leads to reinventing the wheel, especially in: <ul><li>Propagation of uncertainty distributions</li><li>Sparse data to gridded data comparisons</li></ul> | Forcing all input datasets to a common grid pushes complexity elsewhere and complicates uncertainty quantification. | <ul><li>Automatically capture and propagate units, dimensions, and error/uncertainty fields from input datasets</li><li>Bring data in on the grids/meshes its on. Make [safe remeshing strategies](regridder/data_aggregation.md) the default.</li></ul> |
-| **REPRODUCE** | <ul><li>Usually harder to re-run analyses than people claim, and no automated ways to verify reproducibility</li><li>It's difficult to swap out input data sources to extend or remix comparisons</li></ul> | Forcing users into a walled garden adds too much friction to collaboration | Automated workflows should prove reproducibility and facilitate easy data updates. Provide [template repositories](https://github.com/Englacial/xopr-snakemake-demo/), but don't force specific tools on users. |
+| | Problem | Pitfalls | Our Approach | | --- | --- | --- | --- | | **INPUT** |
+<ul><li>Manual downloading of data is not scaleable or reproducible</li><li>Too
+many lines of code are spent loading and getting data in the right
+shape</li></ul> | <ul><li>Waiting on data providers to adopt new formats is too
+slow</li><li>Re-writing and storing data in large quantitites is
+[not](https://pangeo-forge.readthedocs.io/en/latest/)
+[sustainable](https://discourse.pangeo.io/t/us-central1-pangeo-hub-down/4591)</li></ul>
+| Lightweight, **zero-infrastructure catalogs** that reference data where it
+already lives using **CF conventions** for interoperability, such as
+[xOPR](https://github.com/englacial/xopr). <br /> Core technologies:
+[STAC](https://stacspec.org/en), [Intake](https://github.com/intake/intake),
+and [VirtualiZarr](https://github.com/zarr-developers/VirtualiZarr) | |
+**COMPARE** | Lack of sensible defaults leads to reinventing the wheel,
+especially in: <ul><li>Propagation of uncertainty distributions</li><li>Sparse
+data to gridded data comparisons</li></ul> | Forcing all input datasets to a
+common grid pushes complexity elsewhere and complicates uncertainty
+quantification. | <ul><li>Automatically capture and propagate units,
+dimensions, and error/uncertainty fields from input datasets</li><li>Bring data
+in on the grids/meshes its on. Make [safe remeshing
+strategies](regridder/data_aggregation.md) the default.</li></ul> | |
+**REPRODUCE** | <ul><li>Usually harder to re-run analyses than people claim,
+and no automated ways to verify reproducibility</li><li>It's difficult to swap
+out input data sources to extend or remix comparisons</li></ul> | Forcing users
+into a walled garden adds too much friction to collaboration | Automated
+workflows should prove reproducibility and facilitate easy data updates.
+Provide [template
+repositories](https://github.com/Englacial/xopr-snakemake-demo/), but don't
+force specific tools on users. |
 
 
 ## Has this been done before?
