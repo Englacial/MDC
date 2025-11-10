@@ -9,5 +9,5 @@ Start with [why_this_project.md](./why_this_project.md) for an overview of what 
 Then explore the following pages and directories:
 
  - [initial_use_cases.md](./initial_use_cases.md) describes example model-data comparisons we're trying to make easy
- - [design_doc](./design_doc.md) is our working draft design document
- - [healpix.md](./healpix.md) is an overview of software maturity for supporing healpix meshes
+ - [design_doc](./regridder/design_doc.md) is our working draft design document
+ - [healpix.md](./regridder/healpix.md) is an overview of software maturity for supporing healpix meshes
