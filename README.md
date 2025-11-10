@@ -20,8 +20,8 @@ Other documents to explore on the following pages and directories:
  - [vision](./vison.md) is another broad document that hints at the cleaner API
    we're hoping to arrive at
 
-For our regridding module specifically, check out the [regridder](./regridder)
-folder generally, and these docs in specific:
+For our regridding module, check out the [regridder](./regridder) folder
+generally, and these docs in specific:
 
  - [design_doc](./regridder/design_doc.md) is our working draft design document
  - [healpix.md](./regridder/healpix.md) is an overview of software maturity for
