@@ -23,21 +23,16 @@ if it advances our goals described in the first part.
 
 # Part 1: Target use cases
 
-## Dataset example: Loading ISMIP6 model outputs (TODO: Thomas)
+## Dataset example: Loading ISMIP6 model outputs
 
-How this is done now:
+For a running notebook of "how this is done now," see here: https://github.com/englacial/ismip-indexing/blob/main/working_with_ismip6_examples.ipynb
 
-```python
-ismip6_df = ismip6_index.get_file_index() # This is 200 lines of code - https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py
-path = ismip6_df[{'model': 'UCIJPL/ISSM', 'experiment': 'exp05', 'variable': 'lithk'}]['path']
-my_variable = xr.open_dataset(path)
-```
-
-What we want to be able to do:
+What we want to be able to do would look more like this:
 
 ```python
-ismip6_dt = open_datatree('gs://ismip6/ismip6-virtual.zarr')
-my_variable = ismip6_dt['UCIJPL/ISSM']['exp05']['lithk']
+ismip6_cat = intake.open_esm_datastore('gs://ismip6/ismip6.json')
+ismip6_dt = ismip6_cat.to_datatree(preprocess=xmip.fix_ismip6)
+my_variable = ismip6_dt['JPL1/ISSM']['exp05']['lithk']
 ```
 
 * ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
@@ -46,39 +41,32 @@ my_variable = ismip6_dt['UCIJPL/ISSM']['exp05']['lithk']
 * This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
 * Key issue: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
 
-### Variance of some subset of models
+### Regrid children in a DataTree to a common comparison space
+
+We think it's important for there to be a "batteries-included" way to regridding to a common grid.
+Regridding should be lazy and eventually support a pretty wide range of possible grids including rectilinear in lat/lon or projected coordiantes, healpix, and unstructued meshes.
+
+[xESMF](https://xesmf.readthedocs.io/en/stable/) is probably the closest to being what we're looking for, though its dependence on the Fortran/C++ ESMF makes it an annoying piece of the stack to include.
+
+Eventually, we'd want regridding to look something like this:
 
 ```python
-# Assuming we have an ismip6_outputs datatree from the last example
-model_outputs = ismip6_dt.match("*/exp05")
-
 comparison_grid = xr.Dataset({
     'x': (['x'], np.arange(-30400e3, 3040e3, 16e3)),
     'y': (['y'], np.arange(-30400e3, 3040e3, 16e3)),
 })
-
 model_outputs = regrid(model_outputs, target=comparison_grid, func=np.mean)
+```
 
+### Variance of some subset of models
+
+This part actually already works pretty well once we have a unified DataTree:
+
+```python
 lithk_var = xr.concat(
     [child['lithk'] for m in model_outputs.children.values()],
     dim='m'
 ).var(dim='m')
-```
-
-* We want a "batteries-included" way to regridding to a common grid
-* Regridding should be lazy
-* And (eventually) we need to support a pretty wide range of possible grids including rectilinear in lat/lon or projected coordiantes, healpix, and unstructued meshes
-
-
-### Plots of some subset
-
-```python
-model_outputs = ismip6_dt.match("UCIJPL_ISSM/*")
-
-hv.Layout([
-    child['lithk'].hvplot(title=name, x='x', y='y', groupby='time')
-    for name, child in model_outputs.children.items()
-]).cols(3)
 ```
 
 ## Dataset example: IceSAT-2 ATL06 (TODO: Shane)
