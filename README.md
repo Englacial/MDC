@@ -1,6 +1,6 @@
 # Model Data Comparision - Design and Reference
 
-This repository is collates ideas, designs, references, and discussion for
+This repository collates ideas, designs, references, and discussion for
 creating a general purpose model-to-data, model-to-model, and data-to-data
 tool, initially aimed at serving the cyrosphere and ice sheet modelling
 research community.
