@@ -42,7 +42,7 @@ partition that work load, which could have overlap with spatial chunking.
 
 ## Cheng Gong
 
-[Cheng](https://github.com/enigne) is a contributor to the [ISSM](https://issm.jpl.nasa.gov/] 
+[Cheng](https://github.com/enigne) is a contributor to the [ISSM](https://issm.jpl.nasa.gov/) 
 model (repository [here](https://github.com/ISSMteam/ISSM)), and his project is
 focused on [developing a Physically Informed Neural Network (PINN)](https://github.com/ISSMteam/PINNICLE) 
 to provide mesh free reference data set for ice sheet model initialization. Effectively,
