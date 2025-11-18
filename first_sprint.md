@@ -25,7 +25,7 @@ if it advances our goals described in the first part.
 
 ## Dataset example: Loading ISMIP6 model outputs
 
-For a running notebook of "how this is done now," see here: https://github.com/englacial/ismip-indexing/blob/main/working_with_ismip6_examples.ipynb
+For a running notebook of "how this is done now," see here: [https://github.com/englacial/ismip-indexing/blob/main/working_with_ismip6_examples.ipynb](https://github.com/englacial/ismip-indexing/blob/main/notebooks/working_with_ismip6_examples.ipynb)
 
 What we want to be able to do would look more like this:
 
@@ -38,7 +38,7 @@ my_variable = ismip6_dt['JPL1/ISSM']['exp05']['lithk']
 * ISMIP6 outputs are ~1.1 TB that we moved from Globus to a GCloud storage bucket
 * Every variable is a separate NetCDF file, which are nominally CF-compliant but with a scattering of errors
 * All of them are aligned regular grids in EPSG:3031, but there are multiple resolutions
-* This can be done (https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py), but it takes too much code. Too much code == bad reproducibility and modularity
+* This can be done ([https://github.com/englacial/ismip-indexing/blob/main/ismip6_index.py](https://github.com/englacial/ismip-indexing/blob/main/ismip6_helper/index.py)), but it takes too much code. Too much code == bad reproducibility and modularity
 * Key issue: Legacy datasets are not always correctly formatted. How do we encode the "fixes" so that everyone doesn't have to do it themselves?
 
 ### Regrid children in a DataTree to a common comparison space
